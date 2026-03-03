@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"os"
 
 	"github.com/C4triplezero/gator/internal/config"
 )
@@ -12,16 +12,29 @@ func main() {
 	if err != nil {
 		log.Fatalf("error reading config: %v", err)
 	}
-	fmt.Printf("Read config: %+v\n", cfg)
 
-	err = cfg.SetUser("lane")
-	if err != nil {
-		log.Fatalf("couldn't set current user: %v", err)
+	programState := &state{
+		Config: &cfg,
 	}
 
-	cfg, err = config.Read()
-	if err != nil {
-		log.Fatalf("error reading config: %v", err)
+	cmds := commands{
+		Commands: map[string]func(*state, command) error{},
 	}
-	fmt.Printf("Read config again: %+v\n", cfg)
+	cmds.register("login", handlerLogin)
+
+	args := os.Args
+	if len(args) < 2 {
+		log.Fatalf("Usage: cli <command> [args...]")
+	}
+
+	cmd := command{
+		Name: args[1],
+		Args: args[2:],
+	}
+
+	err = cmds.run(programState, cmd)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
