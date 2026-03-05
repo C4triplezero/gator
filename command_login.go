@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -8,13 +9,19 @@ func handlerLogin(s *state, cmd command) error {
 	if len(cmd.Args) == 0 {
 		return fmt.Errorf("usage: %s <name>", cmd.Name)
 	}
+	name := cmd.Args[0]
 
-	err := s.Config.SetUser(cmd.Args[0])
+	_, err := s.DB.GetUser(context.Background(), name)
+	if err != nil {
+		return fmt.Errorf("user: %s does not exist", name)
+	}
+
+	err = s.Config.SetUser(name)
 	if err != nil {
 		return fmt.Errorf("couldn't set current user: %w", err)
 	}
 
-	fmt.Printf("User: %s has been set\n", cmd.Args[0])
+	fmt.Printf("User: %s has been set\n", name)
 
 	return nil
 }

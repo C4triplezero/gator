@@ -2,13 +2,7 @@ package main
 
 import (
 	"errors"
-
-	"github.com/C4triplezero/gator/internal/config"
 )
-
-type state struct {
-	Config *config.Config
-}
 
 type command struct {
 	Name string
