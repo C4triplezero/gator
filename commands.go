@@ -86,3 +86,14 @@ func handlerUsers(s *state, cmd command) error {
 
 	return nil
 }
+
+func handleAggregation(s *state, cmd command) error {
+	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+	if err != nil {
+		return fmt.Errorf("unable to fetch feed: %w", err)
+	}
+
+	fmt.Println(feed)
+
+	return nil
+}
