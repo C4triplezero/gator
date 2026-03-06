@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/C4triplezero/gator/internal/database"
@@ -93,14 +94,21 @@ func handlerUsers(s *state, cmd command) error {
 }
 
 func handlerAggregation(s *state, cmd command) error {
-	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
-	if err != nil {
-		return fmt.Errorf("unable to fetch feed: %w", err)
+	if len(cmd.Args) == 0 {
+		return fmt.Errorf("usage: %s <time_between_requests>", cmd.Name)
 	}
 
-	fmt.Println(feed)
+	timeBetweenRequests, err := time.ParseDuration(cmd.Args[0])
+	if err != nil {
+		return fmt.Errorf("%s is not a valid duration: %w", cmd.Args[0], err)
+	}
 
-	return nil
+	log.Printf("Collecting feeds every %s...", timeBetweenRequests)
+
+	ticker := time.NewTicker(timeBetweenRequests)
+	for ; ; <-ticker.C {
+		scrapeFeeds(s)
+	}
 }
 
 func handlerAddFeed(s *state, cmd command, user database.User) error {
