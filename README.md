@@ -1,9 +1,60 @@
-Requires Postgres and Go installed to run
-can be installed from https://github.com/C4triplezero/gator using go install
-create a file called ".gatorconfig.json" in your home directory containing this:
-{"db_url":"postgres://postgres:postgres@localhost:5432/gator?sslmode=disable","current_user_name":"c4"}
-use the register command to create a user | arument: name
-use the login command to switch between users | argument: name
-use the addfeed command to added a feed to be scrapped from | arguments: name of post and url
-use the agg command to collect posts from your feeds | argument: time between collections
-use the browse command to view collected posts optional | argument: amount of posts to view (defaults to 2)
+# Gator
+
+A multi-player command line tool for aggregating RSS feeds and viewing the posts.
+
+## Installation
+
+Make sure you have the latest [Go toolchain](https://golang.org/dl/) installed as well as a local Postgres database. You can then install `gator` with:
+
+```bash
+go install ...
+```
+
+## Config
+
+Create a `.gatorconfig.json` file in your home directory with the following structure:
+
+```json
+{
+  "db_url": "postgres://username:@localhost:5432/database?sslmode=disable"
+}
+```
+
+Replace the values with your database connection string.
+
+## Usage
+
+Create a new user:
+
+```bash
+gator register <name>
+```
+
+Add a feed:
+
+```bash
+gator addfeed <url>
+```
+
+Start the aggregator:
+
+```bash
+gator agg 30s
+```
+
+View the posts:
+
+```bash
+gator browse [limit]
+```
+
+There are a few other commands you'll need as well:
+
+- `gator register <name>` - Create a user that doesn't exist and login
+- `gator login <name>` - Log in as a user that already exists
+- `gator users` - List all users
+- `gator feeds` - List all feeds
+- `gator follow <url>` - Follow a feed that already exists in the database
+- `gator unfollow <url>` - Unfollow a feed that already exists in the database
+- `gator agg <interval>` - Collect posts from your followed feeds with the given interval between collections
+- `gator browse <limit>` - View collected posts with optional limit (default limit is 2)
